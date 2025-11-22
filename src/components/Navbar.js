@@ -6,9 +6,7 @@ const Navbar = ({ onRunForecast, isTraining }) => {
       <div className="container">
         <div className="d-flex flex-column">
           <h1 className="nav-title">Peripherals Inventory Forecast</h1>
-          <span className="nav-subtitle">
-            Predictive Stock Analytics Dashboard
-          </span>
+          <span className="nav-subtitle">Predictive Stock Dashboard</span>
         </div>
 
         <div className="ms-auto d-flex align-items-center gap-3">

@@ -4,7 +4,6 @@ import SummaryCard from "../components/SummaryCard";
 const LandingPage = ({ data, stats, isTraining, isTfReady }) => {
   return (
     <div className="container py-5">
-      {/* Summary Cards (No Icons) */}
       <div className="row mb-4">
         <SummaryCard title="Total Products Fetched" value={stats.total} />
         <SummaryCard
@@ -55,7 +54,6 @@ const LandingPage = ({ data, stats, isTraining, isTfReady }) => {
                       {item.name}
                     </td>
                     <td className="table-cell">
-                      {/* Red text for low stock */}
                       <span
                         className={
                           item.inventory < 10
