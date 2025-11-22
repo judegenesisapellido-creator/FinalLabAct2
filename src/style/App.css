@@ -1,0 +1,172 @@
+/* --- Color Variables based on the Badminton/Sage Design --- */
+:root {
+  --bg-cream: #F3F7ED;      /* Main Background */
+  --sage-dark: #748B6F;     /* Navbar Background */
+  --sage-light: #F0F4EC;    /* Table Headers */
+  --sage-accent: #98AF92;   /* 'Hold' Badges */
+  --sage-button: #D2DCB6;   /* Button Background from image */
+  
+  --text-main: #1F2937;
+  --text-muted: #6B7280;
+  --white: #FFFFFF;
+  
+  /* Alert/Status Colors */
+  --danger-bg: #FEE2E2;
+  --danger-text: #DC2626;
+  --success-bg: #E0E7DF;    
+  --success-text: #5F6F5B;
+}
+
+body {
+  background-color: var(--bg-cream);
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--text-main);
+}
+
+/* --- Navbar Styling --- */
+.navbar-custom {
+  background-color: var(--sage-dark) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 1rem 0;
+}
+
+.nav-title {
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin: 0;
+  color: var(--white);
+}
+
+.nav-subtitle {
+  font-size: 0.875rem;
+  opacity: 0.9;
+  font-weight: 300;
+  color: #E8EFE6; /* Slightly off-white for subtitle */
+}
+
+/* --- Button Styling (UPDATED to match image) --- */
+.action-btn {
+  background-color: var(--sage-button) !important;
+  color: #4A5D44 !important; /* Dark Sage Text */
+  border: none !important;
+  border-radius: 6px !important;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background-color: #C3D0B0 !important; /* Slightly darker on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+.action-btn:disabled {
+  cursor: wait;
+  opacity: 0.8;
+  background-color: #E2E8D5 !important;
+}
+
+/* --- Card Styling --- */
+.summary-card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  background-color: var(--white);
+  height: 100%;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease;
+}
+
+.icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+/* --- Table Styling --- */
+.table-card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  background-color: var(--white);
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.table-custom-header {
+  background-color: var(--sage-light) !important;
+  color: #5F6F5B;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  border-bottom: none;
+}
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.table-row {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.table-cell {
+  vertical-align: middle;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  padding: 1rem 0.75rem;
+}
+
+.table-cell-main {
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+/* --- Badges --- */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+}
+
+.badge-reorder {
+  background-color: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+.badge-hold {
+  background-color: var(--sage-accent);
+  color: var(--white);
+}
+
+.badge-pending {
+  background-color: #E5E7EB;
+  color: #6B7280;
+}
+
+/* --- Animations --- */
+@keyframes spin { 
+  0% { transform: rotate(0deg); } 
+  100% { transform: rotate(360deg); } 
+}
+.spin-anim { 
+  animation: spin 1s linear infinite; 
+}
