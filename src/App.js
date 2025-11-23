@@ -2,56 +2,8 @@ import React, { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import LandingPage from "./page/LandingPage";
 import "./style/App.css";
-
-// --- MOCK API GENERATOR ---
-const generateMockData = () => {
-  const products = [
-    "Logitech MX Master 3S",
-    "Razer DeathAdder V3",
-    "Keychron Q1 Pro",
-    "Corsair K70 RGB",
-    "SteelSeries Apex Pro",
-    "HyperX Cloud II",
-    "Logitech G Pro X Superlight",
-    "Razer BlackWidow V4",
-    "Glorious Model O",
-    "Anne Pro 2",
-    "Drop ALT Mechanical Keyboard",
-    "Sennheiser PC38X",
-    "Razer Viper Ultimate",
-    "Ducky One 3 Mini",
-    "SteelSeries Arctis Nova Pro",
-    "Logitech G502 HERO",
-    "Wooting 60HE",
-    "Finalmouse Starlight-12",
-    "Cherry MX Board 3.0",
-    "Razer Huntsman Mini",
-  ];
-
-  return Array.from({ length: 100 }, (_, index) => {
-    const isLowStock = Math.random() > 0.7;
-    const sales = Math.floor(Math.random() * 40) + 5;
-    const leadTime = Math.floor(Math.random() * 10) + 3;
-
-    const threshold = Math.ceil((sales / 7) * leadTime);
-    const inventory = isLowStock
-      ? Math.floor(Math.random() * threshold)
-      : Math.floor(Math.random() * 50) + threshold;
-
-    return {
-      id: index + 1,
-      name: `${products[index % products.length]} - Batch ${
-        Math.floor(index / products.length) + 1
-      }`,
-      inventory,
-      sales,
-      leadTime,
-      safety: Math.floor(sales * 0.5),
-      prediction: "Pending",
-      supply: (inventory / (sales / 7)).toFixed(1),
-    };
-  });
-};
+// Import the data generator
+import { generateMockProducts } from "./api/Data";
 
 export default function App() {
   const [data, setData] = useState([]);
@@ -66,12 +18,14 @@ export default function App() {
   // 1. Load Bootstrap & TensorFlow.js
   useEffect(() => {
     const loadScripts = async () => {
+      // Bootstrap
       const link = document.createElement("link");
       link.href =
         "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css";
       link.rel = "stylesheet";
       document.head.appendChild(link);
 
+      // TensorFlow.js
       const script = document.createElement("script");
       script.src = "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest";
       script.async = true;
@@ -84,14 +38,15 @@ export default function App() {
 
     loadScripts();
 
+    // Fetch 100 Products
     setTimeout(() => {
-      const fetchedData = generateMockData();
+      const fetchedData = generateMockProducts(100);
       setData(fetchedData);
       setStats((prev) => ({ ...prev, total: fetchedData.length }));
     }, 800);
   }, []);
 
-  // --- TENSORFLOW LOGIC  ---
+  // --- TENSORFLOW LOGIC ---
   const runForecastAnalysis = async () => {
     if (!isTfReady || !window.tf) {
       alert("TensorFlow Engine loading... please wait.");
@@ -99,7 +54,7 @@ export default function App() {
     }
 
     setIsProcessing(true);
-    setStats((prev) => ({ ...prev, status: "Analyzing..." }));
+    setStats((prev) => ({ ...prev, status: "Training Model..." }));
 
     try {
       const tf = window.tf;
@@ -109,15 +64,15 @@ export default function App() {
       const trainLabels = [];
 
       for (let i = 0; i < 200; i++) {
-        const stock = Math.floor(Math.random() * 50);
-        const avgSales = Math.floor(Math.random() * 60) + 5;
-        const leadTime = Math.floor(Math.random() * 10) + 1;
+        const stock = Math.floor(Math.random() * 500) + 10;
+        const sales = Math.floor(Math.random() * 80) + 5;
+        const lead = Math.floor(Math.random() * 20) + 3;
 
-        // Simple logic for training labels: 1 = Reorder, 0 = Don't Reorder
-        const needed = (avgSales / 7) * leadTime;
+        const daysSupply = stock / (sales / 7);
+        const shouldReorder = daysSupply < lead ? 1 : 0;
 
-        trainInputs.push([stock, avgSales, leadTime]);
-        trainLabels.push([stock < needed ? 1 : 0]);
+        trainInputs.push([stock, sales, lead]);
+        trainLabels.push([shouldReorder]);
       }
 
       const trainingData = tf.tensor2d(trainInputs);
@@ -143,31 +98,34 @@ export default function App() {
         shuffle: true,
       });
 
-      // 4. Predict (Applied to dashboard items)
-      // Convert dashboard data to tensors
+      // 4. Predict
       const inputValues = data.map((item) => [
-        item.inventory,
-        item.sales,
-        item.leadTime,
+        item.currentInventory,
+        item.avgSalesPerWeek,
+        item.daysToReplenish,
       ]);
       const newProduct = tf.tensor2d(inputValues);
 
       const result = model.predict(newProduct);
       const predictions = await result.data();
 
-      // Update UI
+      // --- UPDATED LOGIC HERE ---
       let reorderCount = 0;
       const updatedData = data.map((item, index) => {
         const value = predictions[index];
-        const shouldReorder = value > 0.5; // "Reorder" : "No Reorder"
+        const shouldReorder = value > 0.5;
 
         if (shouldReorder) reorderCount++;
 
         return {
           ...item,
-          prediction: shouldReorder ? "Reorder" : "Hold",
+          // Updated to "Suggestion: Reorder" / "Suggestion: Hold"
+          prediction: shouldReorder
+            ? "Suggestion: Reorder"
+            : "Suggestion: Hold",
         };
       });
+      // --------------------------
 
       setData(updatedData);
       setStats({
