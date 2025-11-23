@@ -120,13 +120,11 @@ const LandingPage = ({ data, stats, isProcessing, isTfReady }) => {
                     <td className="table-cell">{item.avgSalesPerWeek} / wk</td>
                     <td className="table-cell">{item.daysToReplenish} days</td>
                     <td className="table-cell text-center">
-                      {/* UPDATED: Matches 'Suggestion: Reorder' */}
                       {item.prediction === "Suggestion: Reorder" && (
                         <span className="status-badge badge-reorder">
                           Suggestion: Reorder
                         </span>
                       )}
-                      {/* UPDATED: Matches 'Suggestion: Hold' */}
                       {item.prediction === "Suggestion: Hold" && (
                         <span className="status-badge badge-hold">
                           Suggestion: Hold

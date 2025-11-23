@@ -119,7 +119,6 @@ export default function App() {
 
         return {
           ...item,
-          // Updated to "Suggestion: Reorder" / "Suggestion: Hold"
           prediction: shouldReorder
             ? "Suggestion: Reorder"
             : "Suggestion: Hold",
