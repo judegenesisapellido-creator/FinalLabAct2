@@ -12,7 +12,6 @@ const SummaryCard = ({ title, value, subtext, type }) => {
   return (
     <div className="col-md-4 mb-4">
       <div className="summary-card">
-        {/* Icon Box Removed */}
         <div className="d-flex flex-column justify-content-center h-100">
           <div className="text-muted mb-1" style={{ fontSize: "0.9rem" }}>
             {title}

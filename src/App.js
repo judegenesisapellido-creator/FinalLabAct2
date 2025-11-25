@@ -2,8 +2,32 @@ import React, { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import LandingPage from "./page/LandingPage";
 import "./style/App.css";
-// Import the data generator
-import { generateMockProducts } from "./api/Data";
+
+// --- API FETCHING LOGIC (Moved here from Data.js) ---
+const API_URL = "http://localhost:8082/api/products"; // Port 8082 based on your screenshot
+
+const fetchProductsFromApi = async () => {
+  try {
+    const response = await fetch(API_URL);
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const laravelData = await response.json();
+
+    // Map Laravel fields to React App fields
+    return laravelData.map((item) => ({
+      id: item.id,
+      productName: item.name,
+      currentInventory: item.current_inventory || item.stock, // Fallback if naming differs
+      avgSalesPerWeek: item.avg_sales_per_week || item.avg_sales,
+      daysToReplenish: item.days_to_replenish || item.lead_time,
+      prediction: "Pending",
+    }));
+  } catch (error) {
+    console.error("Failed to fetch API data:", error);
+    return [];
+  }
+};
 
 export default function App() {
   const [data, setData] = useState([]);
@@ -38,15 +62,28 @@ export default function App() {
 
     loadScripts();
 
-    // Fetch 100 Products
-    setTimeout(() => {
-      const fetchedData = generateMockProducts(100);
-      setData(fetchedData);
-      setStats((prev) => ({ ...prev, total: fetchedData.length }));
-    }, 800);
+    // --- FETCH DATA FROM LARAVEL API ---
+    const loadData = async () => {
+      setStats((prev) => ({ ...prev, status: "Fetching from API..." }));
+
+      const apiData = await fetchProductsFromApi();
+
+      if (apiData.length > 0) {
+        setData(apiData);
+        setStats((prev) => ({
+          ...prev,
+          total: apiData.length,
+          status: "Data Loaded",
+        }));
+      } else {
+        setStats((prev) => ({ ...prev, status: "API Error / No Data" }));
+      }
+    };
+
+    loadData();
   }, []);
 
-  // --- TENSORFLOW LOGIC ---
+  // --- TENSORFLOW LOGIC (Based strictly on the PDF Guide) ---
   const runForecastAnalysis = async () => {
     if (!isTfReady || !window.tf) {
       alert("TensorFlow Engine loading... please wait.");
@@ -68,6 +105,7 @@ export default function App() {
         const sales = Math.floor(Math.random() * 80) + 5;
         const lead = Math.floor(Math.random() * 20) + 3;
 
+        // Logic: 1 = Reorder, 0 = Don't Reorder
         const daysSupply = stock / (sales / 7);
         const shouldReorder = daysSupply < lead ? 1 : 0;
 
@@ -109,7 +147,7 @@ export default function App() {
       const result = model.predict(newProduct);
       const predictions = await result.data();
 
-      // --- UPDATED LOGIC HERE ---
+      // Update UI with results
       let reorderCount = 0;
       const updatedData = data.map((item, index) => {
         const value = predictions[index];
@@ -124,8 +162,7 @@ export default function App() {
             : "Suggestion: Hold",
         };
       });
-      // --------------------------
-
+      
       setData(updatedData);
       setStats({
         total: updatedData.length,
